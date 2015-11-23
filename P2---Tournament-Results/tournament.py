@@ -64,7 +64,7 @@ def playerStandings():
     db = psycopg2.connect("dbname=tournament")
     c =  db.cursor()
 
-    c.execute("SELECT * FROM Standings_Ordered;")
+    c.execute("SELECT PlayerID, Name, Wins, Matches FROM Standings_Ordered;")
     standings = c.fetchall()
     db.close()
     return standings
