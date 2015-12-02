@@ -15,18 +15,13 @@ CREATE DATABASE tournament;
 --Create Tournament table
 CREATE TABLE Tournament (
     TournamentID serial primary key,
-    Name text);
+    Name varchar);
 
 --Create Players table
 CREATE TABLE Players (
     PlayerID serial primary key,
-    Name text);
-
---Create Standings table
-CREATE TABLE Standings (
-    RowID serial,
     -- TournamentID int references Tournament ON DELETE CASCADE,
-    PlayerID int references Players ON DELETE CASCADE,
+    Name varchar,
     Wins int DEFAULT 0,
     Draws int DEFAULT 0,
     Losses int DEFAULT 0,
@@ -40,17 +35,42 @@ CREATE TABLE Matches (
     Player2ID int references Players(PlayerID) ON DELETE CASCADE,
     WinnerID int);
 
---Create Ordered Standings View
+-- Create Ordered Standings View
+/* This view pulls tournament standings ordered in terms of player
+points, accounting for total matches played.  Assuming two players
+with the same number of wins and draws, the better player is the one
+who has played fewer matches.
+*/
 CREATE VIEW Standings_Ordered AS
     SELECT
-        S.PlayerID,
-        P.Name,
-        S.Wins,
-        S.Draws,
-        S.Wins+S.Losses+S.Draws as Matches
+        PlayerID,
+        Name,
+        Wins,
+        Losses,
+        Draws,
+        Wins+Losses+Draws as Matches
     FROM
-        Standings S
-    INNER JOIN
-        Players P on S.PlayerID=P.PlayerID
+        Players
     ORDER BY
-        S.Wins DESC, S.Draws DESC, Matches;
+        Wins DESC, Draws DESC, Matches;
+
+
+CREATE VIEW Player_Eligible_For_Bye AS
+    SELECT
+        PlayerID,
+        Name,
+        Wins,
+        Losses,
+        Draws,
+        Wins+Losses+Draws as Matches
+    FROM
+        Players P
+    LEFT JOIN
+        Matches M1 on P.PlayerID=M1.Player1ID and P.PlayerID=M1.Player2ID
+    LEFT JOIN
+        Matches M2 on P.PlayerID=M2.Player1ID and P.PlayerID=M2.Player2ID
+    WHERE
+        M1.Player1ID is null and M2.Player1ID is null
+    ORDER BY
+        Matches, Wins, Draws
+    LIMIT 1;

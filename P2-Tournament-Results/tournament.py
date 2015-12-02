@@ -4,8 +4,6 @@
 #
 
 import psycopg2
-import bleach
-
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -14,7 +12,7 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
     c.execute("DELETE FROM Matches;")
     db.commit()
@@ -23,7 +21,7 @@ def deleteMatches():
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
     c.execute("DELETE FROM Players;")
     db.commit()
@@ -31,20 +29,18 @@ def deletePlayers():
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
-    c.execute("SELECT count(*) as Count FROM Standings;")
+    c.execute("SELECT count(*) as Count FROM Players;")
     count = c.fetchone()
     db.close()
     return int(count[0])
 
 def registerPlayer(name):
     #Adds a player to the tournament database.
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
-    c.execute("INSERT INTO Players (Name) VALUES (%s);", (bleach.clean(name),))
-    c.execute("INSERT INTO Standings (PlayerID)"
-        "SELECT MAX(PlayerID) FROM Players;")
+    c.execute("INSERT INTO Players (Name) VALUES (%s)", (name,))
     db.commit()
     db.close()
 
@@ -61,7 +57,7 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
 
     c.execute("SELECT PlayerID, Name, Wins, Matches FROM Standings_Ordered;")
@@ -76,36 +72,32 @@ def reportMatch(winner, loser, draw=0):
       loser:  the id number of the player who lost
       draw (optional):  if specified and non-zero, assume draw.
     """
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
 
     #
     if draw != 0:
         c.execute("INSERT INTO Matches (Player1ID, Player2ID, WinnerID)"
-        "VALUES (%s, %s, %s);", ((winner,), (loser,), 0))
-        db.commit()
+        "VALUES %s;", ((winner, loser, 0),))
 
-        c.execute("UPDATE Standings"
+        c.execute("UPDATE Players"
         " SET Draws = Draws+1"
-        " WHERE Standings.PlayerID in %s;",((winner,loser),))
-        db.commit()
-
+        " WHERE PlayerID in %s;",((winner,loser),))
     else:
         c.execute("INSERT INTO Matches (Player1ID, Player2ID, WinnerID)"
-            "VALUES (%s, %s, %s);", ((winner,), (loser,), (winner,)))
-        db.commit()
+            "VALUES %s;", ((winner, loser, winner),))
 
-        c.execute("UPDATE Standings"
+        c.execute("UPDATE Players"
             " SET Wins = Wins+1"
-            " WHERE Standings.PlayerID = %s;",(winner,))
-        db.commit()
+            " WHERE PlayerID = %s;",(winner,))
 
-        c.execute("UPDATE Standings"
+        c.execute("UPDATE Players"
             " SET Losses = Losses+1"
-            " WHERE Standings.PlayerID = %s;",(loser,))
-        db.commit()
+            " WHERE PlayerID = %s;",(loser,))
 
+    db.commit()
     db.close()
+
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -115,68 +107,86 @@ def swissPairings():
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
 
+    The pairing system will not allow for a rematch.  Thas is, a player may not
+    play the same opponent more than once per tournament.  If all players have
+    already played each other, then the pairings will allow for rematches.
+
     """
+    matches = []
 
     # Pull list of players
     players = playerStandings()
 
-    # Check if tournament contains an odd number of players
-    if len(players) % 2 != 0:
-        #Number of players is odd, so identify who receives a bye
-        #Find a player eligible for a bye
-        i = 1
-        while i<len(players):
-            if checkForBye(players[-i][0])==True:
-                i = i+1
+    # Pair players, accounting for no re-matches
+    while len(players)>1:
+        player1 = players.pop(0)
+        i = 0
+        newPair = ()
+        while len(newPair) < 2:
+            if i == len(players):
+                player2 = players.pop(0)
+                newPair = (player1[0], player1[1], player2[0], player2[1])
+                matches.append(newPair)
             else:
-                # Record a bye for eligible player
-                recordBye(players[-i][0])
-                # Remove player from the list of players awaiting pairings
-                del players[-i]
-                break
-
-    # Proceed to pair as normal
-    num_matches = len(players) / 2
-    matches = []
-
-    for i in range(0, num_matches):
-        matches.append((players[i*2][0],players[i*2][1],players[i*2+1][0],players[i*2+1][1]))
-
+                player2check = players[i]
+                if (player2check[0] in pastOpponents(player1[0])):
+                    i = i + 1
+                else:
+                    player2 = players.pop(i)
+                    newPair = (player1[0], player1[1], player2[0], player2[1])
+                    matches.append(newPair)
     return matches
 
 
-def checkForBye(player):
-    # Checks the Matches table in tournament database
-    # If Player1 = Player2, then it is assumed that the match was a bye
-    # Returns True if player has already had a bye
-    db = psycopg2.connect("dbname=tournament")
-    c =  db.cursor()
-    c.execute("SELECT Count(1)"
+def pastOpponents(player):
+    # Returns list of players which 'player' has already played
+    db = connect()
+    c = db.cursor()
+    c.execute(
+        " SELECT Player2ID Players"
         " FROM Matches"
-        " WHERE Player1ID=Player2ID and Player1ID=%s;", (player,))
-    count = int(c.fetchone()[0])
+        " WHERE Player1ID = %s AND Player1ID <> Player2ID"
+        " UNION"
+        " SELECT Player1ID Players"
+        " FROM Matches"
+        " WHERE Player2ID = %s AND Player1ID <> Player2ID;"
+        , ((player), (player),))
+
+    opponents = c.fetchall()
+
     db.close()
 
-    if count != 0:
-        return True
-    else:
-        return False
+    return [row[0] for row in opponents]
+
+
+def getByePlayer():
+    """ Returns player who is eligible for a bye.  Typically this will be the
+    player in last place.  If this player has already had a bye, then
+    the next-to-last place player receives the bye.  This process continues
+    to move up the standings until it finds a player without a bye.
+    """
+    db = connect()
+    c = db.cursor()
+    c.execute("SELECT PlayerID FROM Player_Eligible_For_Bye;")
+    player = c.fetchone()[0]
+    db.close()
+
+    return player
+
 
 def recordBye(player):
     # Records a bye for given player
-    db = psycopg2.connect("dbname=tournament")
+    db = connect()
     c =  db.cursor()
 
     # Insert 'bye' record into Matches table. Player1 = Player2
     c.execute("INSERT INTO Matches (Player1ID, Player2ID, WinnerID)"
-        "VALUES (%s, %s, %s);", ((player,), (player,), (player,)))
-    db.commit()
+        "VALUES %s;", ((player, player, player),))
 
     # Update standings for player on bye
-    c.execute("UPDATE Standings"
+    c.execute("UPDATE Players"
         " SET Wins = Wins+1"
-        " WHERE Standings.PlayerID = %s;",(player,))
-    db.commit()
+        " WHERE PlayerID = %s;",(player,))
 
+    db.commit()
     db.close()
-    print "Bye recorded for PlayerID=%s" % (player)
