@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="header">
+   <div class="header-left">
+   </div>
+   <div class="header-center">
+      <h1>Restaurants</h1>
+   </div>
+   <div class="header-right">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+         <span class="glyphicon glyphicon-cog"></span></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+         <li>
+            <a href="{{url_for('newRestaurant')}}">
+               <span class="glyphicon glyphicon-plus"></span> New Restaurant
+            </a></li>
+         <li class="divider"></li>
+         <li><a href="{{url_for('gdisconnect')}}">
+               <span class="glyphicon glyphicon-log-out"></span> Logout
+            </a></li>
+   </div>
+</div>
+<div id="site">
+   <div class="container">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+         <div class = "alert alert-success fade in">
+            <ul>
+               {% for message in messages %}
+               <li> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong> {{ message }} </strong> </li>
+               {% endfor %}
+            </ul>
+         </div>
+      {% endif %}
+      {% endwith %}
+      <div class="restaurants">
+         {% for i in restaurants %}
+         <a href="{{url_for('showMenu', restaurant_id=i.id)}}">
+            <div class="restaurant card card-1">
+               <div>
+                     <img class="restaurant-image" src="/static/images/{{i.id}}.jpg" alt="restaurant image" title="View menu"/>
+               </div>
+               <div class="restaurant-name">
+                  {{i.name}}
+               </div>
+            </div>
+         </a>
+         {% endfor %}
+      </div>
+   </div>
+</div>
+{% endblock content %}
