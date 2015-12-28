@@ -1,40 +1,34 @@
-# Project 2 - Tournament Results
-Python module that uses a PostgreSQL database to keep track of players, matches, and results in a tournament.
+# Project 3 - Item Catalog
+This web application displays a listing of restaurants, and a corresponding menu for each restaurant.  Registered users have the ability to create, update, and delete restaurants and menu items.
 
-The tournament uses the Swiss system for pairing up players in each round: players are not eliminated, and each player should be paired with another player with the same number of wins, or as close as possible.
-
-This project consists of two parts: defining the database schema (SQL table definitions), and writing the code that will use it.
+The application is based in Python, makes use of the Flask web-development framework, and is backed by a SQLite database.  Google's OAuth2 specifications are used for authorization.
 
 ### How can I get the code?
-Feel free to Fork your own version of this code and play around within the three files.
+Feel free to Fork your own version of this code and play around within the files.
 
 ### What are the technical requirements?
-* Python 2.7 (libraries: psycopg2, bleach)
-* PostgreSQL
-* psql
+* Python 2.7 (libraries: flask, sqlalchemy, werkzeug, oauth2client)
 
 ### What's Included
-Within the download you'll find the following files:
+Within the repository you'll find the following files:
 ```
-tournament.sql
-tournament.py
-tournament_test.py
-EC_test.py
-sim.py
+app.py
+database_setup.py
+restaurantmenu.db
+client_secrets.json
+static (directory)
+templates (directory)
 ```
 
 ### How do I run the application?
-1. Initialize the database using psql in command line:  psql -f tournament.sql
-2. Validate the tournament.py module and the tournament database schema, by running the unit tests file in command line:  python tournament_test.py
-3. Optionally, run a simulator to create random tournament results:  python sim.py
-Query the results in the tournament database:  select * from standings_ordered;
-4. Optionally, execute the individual functions within the tournament.py module to interact with the database.
-
+1. Run app.py.  This will host the application on a local server.
+2. Open web browser, and navigate to localhost:5000/
+3. Play around in the app!
 
 ### Application Features
-* Keep track of players and results for a Swiss-Style tournament (popular with Chess, Go, and MTG tournaments)
-* Automatically determine round-by-round pairings - each player is paired with an opponent who has won the same number of matches
-* Pairings will seek to prevent rematches between players with similar records
-* If an odd number of participants is registered, the application intelligently assigns a 'bye' to the appropriate player
-* Standings keeps track of players' Wins, Losses, and even Draws
-* Match results are tracked for history and later data discovery
+* JSON API endpoints provide read access to the restaurants and menu items in the database.
+* Responsive web layout compatible with mobile and desktop browsers.
+* Bootstrap styling for familiarity.
+* Login using your Google credentials for access to 'Admin' features.
+* Create new restaurants, and assign images or logos to each restaurant.
+* Update menu item course, name, price, or description using dedicated forms.
