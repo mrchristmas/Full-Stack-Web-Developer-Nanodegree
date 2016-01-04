@@ -6,6 +6,7 @@
 <div id = "site">
    <div class="container container-form">
       <form action="#" method = 'post' enctype="multipart/form-data">
+         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
          <dl>
             <dt>Name:</dt>
             <dd><input type ='text' size='30' name='name' placeholder={{restaurant.name}}></dd>
