@@ -50,7 +50,8 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = "Restaurant Menu Application"
 
 # Open Database Session
-engine = create_engine('sqlite:///restaurantmenu.db')
+engine = create_engine(
+    'postgresql://catalog:catalog@localhost:5432/restaurantmenu')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
