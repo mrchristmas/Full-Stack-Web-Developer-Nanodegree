@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+   <div id = 'header'>
+      <div class="header-left">
+         <a class="btn" href="{{url_for('showRestaurants')}}">
+            <span class="glyphicon glyphicon-chevron-left"></span></a>
+      </div>
+      <h1>Menu</h1>
+      <div class="header-right">
+      </div>
+   </div>
+   <div id = "site">
+      <div id = "menu-container">
+
+         <div id = "menu-title">
+            <div class="restaurant-name">
+               <h1>{{restaurant.name}}</h1>
+            </div>
+         </div>
+
+         <!-- Flash alerts -->
+         <div class = "container">
+         {% with messages = get_flashed_messages() %}
+         {% if messages %}
+            <div class = "alert alert-success fade in">
+               <ul>
+                  {% for message in messages %}
+                  <li> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong> {{ message }} </strong> </li>
+                  {% endfor %}
+               </ul>
+            </div>
+         {% endif %}
+         {% endwith %}
+         </div>
+
+         <!-- Macro to iterate over items by course -->
+         {% macro display_course(course_name) -%}
+             {% for i in items if i.course == course_name %}
+                 {% if loop.first %}
+                        <h3>{{ course_name }}s</h3>
+                 {% endif %}
+                  <div class = "menu-item">
+                     <div class = 'menu-name'>
+                        <p>{{i.name}}</p>
+                     </div>
+                     <div class = 'menu-price'>
+                        <p>{{i.price}}</p>
+                     </div>
+                     <div class = 'menu-description'>
+                        <p>{{i.description}}</p>
+                     </div>
+                  </div>
+             {% endfor %}
+         {%- endmacro %}
+
+         <!-- Display Menu items -->
+         {% if items|count == 0 %}
+            <p>This restaurant has no menu items.</p>
+         {% else %}
+            <div class = "container container-card">
+               {{ display_course('Appetizer') }}
+            </div>
+            <div class = "container container-card">
+               {{ display_course('Entree') }}
+            </div>
+            <div class = "container container-card">
+               {{ display_course('Dessert') }}
+            </div>
+            <div class = "container container-card">
+               {{ display_course('Beverage') }}
+            </div>
+         {% endif %}
+      </div>
+   </div>
+{% endblock content %}

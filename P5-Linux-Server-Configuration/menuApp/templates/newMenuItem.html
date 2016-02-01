@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+   <div id = 'header'>
+      <div class="header-left"></div>
+      <div class="header-center">
+         <h1>New Item</h1>
+      </div>
+      <div class="header-right"></div>
+   </div>
+   <div id = "site">
+      <div class="container container-form">
+         <form action="{{url_for('newMenuItem', restaurant_id = restaurant.id)}}" method = 'post'>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <dl>
+               <dt>Name:</dt>
+               <dd><input type ='text' size='30' name='name' placeholder = 'Item name'></dd>
+               <dt>Description:</dt>
+               <dd><textarea name = 'description' rows='5' cols='40' placeholder = 'Item description'></textarea></dd>
+               <dt>Price:</dt>
+               <dd><input type = 'text' size = '8' name='price' placeholder = 'Item price'></dd>
+               <dt>Course:</dt>
+               <dd><input type ='radio' name='course' value='Appetizer'>Appetizer</dd>
+               <dd><input type ='radio' name='course' value='Entree'>Entree</dd>
+               <dd><input type ='radio' name='course' value='Dessert'>Dessert</dd>
+               <dd><input type ='radio' name='course' value='Beverage'>Beverage</dd>
+            </dl>
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href='{{url_for('showMenu', restaurant_id = restaurant.id)}}'>Cancel</a>
+         </form>
+   </div>
+{% endblock content %}

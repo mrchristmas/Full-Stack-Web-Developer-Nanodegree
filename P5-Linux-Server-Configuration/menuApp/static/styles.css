@@ -1,0 +1,187 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+}
+
+body {
+    background-color: #F6F6F6;
+}
+
+h1, h2 {
+    font-family: 'Georgia', serif;
+    margin: 0;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+img, object {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
+#header {
+    text-align: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    background-color: #29464F;
+    color: white;
+    position: fixed !important;
+    width: 100%;
+    z-index: 10000;
+    /*white-space: nowrap;*/
+}
+
+#header h1 {
+    margin: auto;
+    width: 100%;
+    display: inline-block;
+}
+
+.header-left {
+    display: inline-block;
+    width: 20%;
+    text-align: left;
+    padding-left: 15px;
+    align-self: flex-end;
+}
+
+.header-left > a {
+    color: white;
+}
+
+.header-center {
+    display: inline-block;
+    width: 60%;
+}
+
+.header-right {
+    display: inline-block;
+    width: 20%;
+    text-align: right;
+    padding-right: 15px;
+    align-self: flex-end;
+}
+
+.header-right > a {
+    color: white;
+}
+
+#site {
+    width: 100%;
+    margin-top: 50px;
+    position: absolute;
+}
+
+.restaurants {
+    text-align: center;
+}
+
+.restaurant {
+    width: 225px;
+    height: 175px;
+    display: inline-block;
+    background-color: white;
+    margin-bottom: 40px;
+    margin-left: 5px;
+    margin-right: 5px;
+    align-self: flex-start;
+}
+
+/* Logic for card shadows borrowed from Samuel Thornton
+http://codepen.io/sdthornton/pen/wBZdXq
+*/
+.card {
+  background: #fff;
+  border-radius: 2px;
+  vertical-align: bottom;
+}
+
+.card-1 {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.1s ease-in-out;
+}
+
+.card-1:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.restaurant-image {
+    max-width: 225px;
+    max-height: 150px;
+}
+
+.restaurant-name {
+    font-size: 1.2em;
+    text-align: center;
+    clear: left;
+    margin: auto;
+}
+
+#menu-title {
+    display: block;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.container-card {
+    clear: both;
+    background-color: #FFF;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    margin-bottom: 30px;
+}
+
+.container-form {
+    clear: both;
+    background-color: #FFF;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    padding: 20px;
+}
+
+.menu-course {
+    clear: both;
+    width: 100%;
+}
+
+.menu-item {
+    width: 100%;
+    margin-bottom: 1em;
+    font-size: 1em;
+}
+
+.menu-name {
+    float: left;
+    width: 50%;
+    text-align: left;
+    font-weight: bold;
+}
+
+.menu-price {
+    float: right;
+    width: 50%;
+    text-align: right;
+    font-weight: bold;
+}
+
+.menu-description {
+    clear: both;
+    width: 100%;
+    text-align: left;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
+.editdeletepane {
+    display: block;
+}

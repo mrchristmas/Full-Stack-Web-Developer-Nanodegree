@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+   <div id = 'header'>
+      <h1>Delete Restaurant</h1>
+   </div>
+   <div id = "site">
+      <div class="container container-form">
+         <h1>Are you sure you wish to delete {{restaurant.name}}?</h1>
+         <form action="{{url_for('deleteRestaurant', restaurant_id=restaurant.id)}}" method = 'post'>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{{url_for('showMenu', restaurant_id=restaurant.id)}}">Cancel</a>
+         </form>
+      </div>
+   </div>
+{% endblock content %}

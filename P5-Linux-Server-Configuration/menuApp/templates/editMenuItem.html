@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+   <div id = 'header'>
+      <h1>Edit Item</h1>
+   </div>
+   <div id="site">
+      <div class="container container-form">
+         <form action="{{url_for('editMenuItem', restaurant_id=restaurant.id, menu_id=item.id)}}" method = 'post'>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <dl>
+               <dt>Name:</dt>
+               <dd><input type ='text' size='35' name='name' placeholder = '{{item.name }}'></dd>
+               <dt>Description:</dt>
+               <dd><textarea name = 'description' rows='5' cols='38' placeholder = '{{item.description }}'></textarea></dd>
+               <dt>Price:</dt>
+               <dd><input type = 'text' size = '8' name='price' placeholder = '{{item.price}}'></dd>
+               <dt>Course:</dt>
+               {% if item.course == 'Appetizier' %}
+               <dd><input type ='radio' name='course' value='Appetizer'checked >Appetizer</dd>
+               {%else%}
+               <dd><input type ='radio' name='course' value='Appetizer' >Appetizer</dd>
+               {% endif %}
+               {% if item.course == 'Entree' %}
+               <dd><input type ='radio' name='course' value='Entree' checked>Entree</dd>
+               {%else%}
+               <dd><input type ='radio' name='course' value='Entree'>Entree</dd>
+               {% endif %}
+               {% if item.course == 'Dessert'%}
+               <dd><input type ='radio' name='course' value='Dessert'checked >Dessert</dd>
+               {% else %}
+               <dd><input type ='radio' name='course' value='Dessert'>Dessert</dd>
+               {% endif %}
+               {%if item.course =='Beverage'%}
+               <dd><input type ='radio' name='course' value='Beverage'checked >Beverage</dd>
+               {% else %}
+               <dd><input type ='radio' name='course' value='Beverage'>Beverage</dd>
+               {% endif %}
+            </dl>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href = '{{url_for('showMenu', restaurant_id = restaurant.id)}}'> Cancel </a>
+         </form>
+      </div>
+   </div>
+{% endblock content %}
