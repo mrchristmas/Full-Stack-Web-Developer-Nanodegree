@@ -46,7 +46,7 @@ app = Flask(__name__)
 csrf = SeaSurf(app)
 
 CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
+    open('/var/www/menuApp/client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Restaurant Menu Application"
 
 # Open Database Session
@@ -95,7 +95,7 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/var/www/menuApp/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -205,7 +205,7 @@ def gdisconnect():
         return redirect(url_for('showRestaurants'))
 
 # Image Uploads
-UPLOAD_FOLDER = 'static/images'
+UPLOAD_FOLDER = '/var/www/menuApp/static/images'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024 # 1 MB limit on file size
@@ -500,4 +500,4 @@ def deleteMenuItem(restaurant_id, menu_id):
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = False
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='52.33.28.141')
